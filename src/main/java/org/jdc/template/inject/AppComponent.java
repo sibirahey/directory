@@ -3,6 +3,7 @@ package org.jdc.template.inject;
 import android.app.Application;
 
 import org.jdc.template.App;
+import org.jdc.template.ui.fragment.DatePickerFragment;
 import org.jdc.template.ux.about.AboutActivity;
 import org.jdc.template.ux.directory.DirectoryActivity;
 import org.jdc.template.ux.individual.IndividualActivity;
@@ -35,4 +36,5 @@ public interface AppComponent {
     Application application();
 
     void inject(SettingsFragment target);
+    void inject(DatePickerFragment target);
 }

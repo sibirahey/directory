@@ -1,5 +1,7 @@
 package org.jdc.template.ux.individualedit;
 
+import android.net.Uri;
+
 import org.jdc.template.model.database.main.individual.Individual;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.LocalTime;
@@ -10,10 +12,11 @@ public class IndividualEditContract {
         boolean validateIndividualData();
         void getIndividualDataFromUi(Individual individual);
         void close();
-        void showAlarmTimeSelector(LocalTime time);
-        void showAlarmTime(LocalTime time);
         void showBirthDateSelector(LocalDate date);
         void showBirthDate(LocalDate date);
+        void showForceSensitiveSelector();
+        void showAffiliationSelector();
+        void showProfilePicture(Uri uri);
     }
 
     public class Extras {

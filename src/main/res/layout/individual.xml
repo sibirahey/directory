@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:text="Jeff Campbell"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/appbar" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="@string/birth_date"
+        android:id="@+id/birthDateTextViewTitle"
+        app:layout_constraintLeft_toLeftOf="@+id/nameTextView"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
+
+    <TextView
+        android:id="@+id/birthDateTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:text="1/1/70"
+        app:layout_constraintLeft_toLeftOf="@+id/birthDateTextViewTitle"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/birthDateTextViewTitle" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="@string/affiliation"
+        android:id="@+id/affiliationTextViewTitle"
+        app:layout_constraintLeft_toLeftOf="@+id/birthDateTextView"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/birthDateTextView" />
+
+    <TextView
+        android:id="@+id/affiliationTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:text="None"
+        app:layout_constraintLeft_toLeftOf="@+id/affiliationTextViewTitle"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/affiliationTextViewTitle" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="@string/force_sensitive"
+        android:id="@+id/forceSensitiveTextViewTitle"
+        app:layout_constraintLeft_toLeftOf="@+id/affiliationTextView"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/affiliationTextView" />
+
+    <TextView
+        android:id="@+id/forceSensitiveTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:text="No"
+        app:layout_constraintLeft_toLeftOf="@+id/forceSensitiveTextViewTitle"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/forceSensitiveTextViewTitle" />
+
+</android.support.constraint.ConstraintLayout>

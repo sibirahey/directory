@@ -5,9 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.devbrackets.android.recyclerext.adapter.RecyclerListAdapter;
+import com.squareup.picasso.Picasso;
 
 import org.jdc.template.R;
 import org.jdc.template.inject.Injector;
@@ -21,12 +23,15 @@ public class DirectoryAdapter extends RecyclerListAdapter<DirectoryAdapter.ViewH
 
     private OnItemClickListener listener;
     private long lastSelectedItemId = 0;
+    private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.text1)
         TextView text1TextView;
         @BindView(R.id.list_item)
         View listItemView;
+        @BindView(R.id.profilePic)
+        ImageView profilePic;
 
         public ViewHolder(View view) {
             super(view);
@@ -42,6 +47,7 @@ public class DirectoryAdapter extends RecyclerListAdapter<DirectoryAdapter.ViewH
         Injector.get().inject(this);
 
         this.inflater = LayoutInflater.from(context);
+        this.context = context;
     }
 
     @Override
@@ -55,10 +61,13 @@ public class DirectoryAdapter extends RecyclerListAdapter<DirectoryAdapter.ViewH
         Individual individual = getItem(position);
         final long itemId = individual.getId();
 
-        // bind data to view holder
+        if(individual.getProfilePicture() != null && !individual.getProfilePicture().isEmpty()) {
+            Picasso.with(context).load(individual.getProfilePicture()).placeholder(R.drawable.default_image).into(holder.profilePic);
+        }else{
+            Picasso.with(context).load(R.drawable.default_image).placeholder(R.drawable.default_image).into(holder.profilePic);
+        }
         holder.text1TextView.setText(individual.getFullName());
 
-        // Click listener
         holder.listItemView.setOnClickListener(v -> onItemClicked(itemId));
     }
 

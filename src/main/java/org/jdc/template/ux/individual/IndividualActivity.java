@@ -1,24 +1,37 @@
 package org.jdc.template.ux.individual;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import org.dbtools.android.domain.date.DBToolsThreeTenFormatter;
 import org.jdc.template.InternalIntents;
-import org.jdc.template.R;
 import org.jdc.template.inject.Injector;
 import org.jdc.template.model.database.main.individual.Individual;
 import org.jdc.template.ui.activity.BaseActivity;
+import org.jdc.template.util.AppConstants;
+import org.jdc.template.util.FloatingActionImageView;
 import org.threeten.bp.LocalDate;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.LocalTime;
 import org.threeten.bp.ZoneId;
+import org.jdc.template.R;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -28,20 +41,23 @@ import butterknife.ButterKnife;
 
 public class IndividualActivity extends BaseActivity implements IndividualContract.View {
 
+    private SharedPreferences sharedPreferences;
+
+    @Nullable
     @BindView(R.id.mainToolbar)
     Toolbar toolbar;
+    @BindView(R.id.appbar)
+    AppBarLayout appbar;
     @BindView(R.id.nameTextView)
     TextView nameTextView;
-    @BindView(R.id.phoneTextView)
-    TextView phoneTextView;
-    @BindView(R.id.emailTextView)
-    TextView emailTextView;
     @BindView(R.id.birthDateTextView)
     TextView birthDateTextView;
-    @BindView(R.id.alarmTimeTextView)
-    TextView alarmTimeTextView;
-    @BindView(R.id.sampleDateTimeTextView)
-    TextView sampleDateTimeEditText;
+    @BindView(R.id.affiliationTextView)
+    TextView affiliationTextView;
+    @BindView(R.id.forceSensitiveTextView)
+    TextView forceSensitiveTextView;
+    @BindView(R.id.activityIndividualImage)
+    ImageView activityIndividualImage;
 
     @Inject
     InternalIntents internalIntents;
@@ -56,6 +72,8 @@ public class IndividualActivity extends BaseActivity implements IndividualContra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = this.getApplication().getSharedPreferences(AppConstants.MY_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+
         setContentView(R.layout.activity_individual);
         ButterKnife.bind(this);
 
@@ -75,6 +93,13 @@ public class IndividualActivity extends BaseActivity implements IndividualContra
 
         if (actionBar != null) {
             actionBar.setTitle(R.string.individual);
+        }
+
+        if(sharedPreferences.getInt(AppConstants.DEVICE_SCREEN_SIZE, 0) < Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) activityIndividualImage.getLayoutParams();
+            lp.anchorGravity = Gravity.BOTTOM | Gravity.RIGHT;
+            lp.rightMargin = 20;
+            activityIndividualImage.setLayoutParams(lp);
         }
     }
 
@@ -101,7 +126,7 @@ public class IndividualActivity extends BaseActivity implements IndividualContra
     @Override
     public void onResume() {
         super.onResume();
-        presenter.reload(false);
+        presenter.reload(true);
     }
 
     public void promptDeleteIndividual() {
@@ -116,11 +141,14 @@ public class IndividualActivity extends BaseActivity implements IndividualContra
 
     public void showIndividual(@Nonnull Individual individual) {
         nameTextView.setText(individual.getFullName());
-        phoneTextView.setText(individual.getPhone());
-        emailTextView.setText(individual.getEmail());
         showBirthDate(individual);
-        showAlarmTime(individual);
-        showSampleDateTime(individual);
+        affiliationTextView.setText(individual.getAffiliation().toString().replace("_", " "));
+        showForceSensitive(individual);
+        if(!individual.getProfilePicture().isEmpty()){
+            Picasso.with(this).load(individual.getProfilePicture()).placeholder(R.drawable.default_image).into(activityIndividualImage);
+        }else{
+            Picasso.with(this).load(R.drawable.default_image).placeholder(R.drawable.default_image).into(activityIndividualImage);
+        }
     }
 
     @Override
@@ -143,23 +171,11 @@ public class IndividualActivity extends BaseActivity implements IndividualContra
         birthDateTextView.setText(DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
     }
 
-    private void showAlarmTime(Individual individual) {
-        if (individual.getAlarmTime() == null) {
-            return;
+    private void showForceSensitive(Individual individual){
+        if(individual.isForceSensitive()){
+            forceSensitiveTextView.setText("YES");
+        }else{
+            forceSensitiveTextView.setText("NO");
         }
-
-        LocalTime time = individual.getAlarmTime();
-        long millis = DBToolsThreeTenFormatter.localDateTimeToLong(time.atDate(LocalDate.now()));
-        alarmTimeTextView.setText(DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_TIME));
-    }
-
-    private void showSampleDateTime(Individual individual) {
-        if (individual.getSampleDateTime() == null) {
-            return;
-        }
-
-        LocalDateTime dateTime = individual.getSampleDateTime();
-        long millis = DBToolsThreeTenFormatter.localDateTimeToLong(dateTime);
-        sampleDateTimeEditText.setText(DateUtils.formatDateTime(this, millis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME));
     }
 }
