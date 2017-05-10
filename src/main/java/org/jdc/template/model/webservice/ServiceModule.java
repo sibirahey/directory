@@ -6,6 +6,7 @@ import android.util.Base64;
 import org.jdc.template.BuildConfig;
 import org.jdc.template.auth.MyAccountInterceptor;
 import org.jdc.template.model.webservice.colors.ColorService;
+import org.jdc.template.model.webservice.individuals.IndividualService;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
@@ -100,5 +101,17 @@ public class ServiceModule {
                 .build();
 
         return retrofit.create(ColorService.class);
+    }
+
+    @Provides
+    @Singleton
+    public IndividualService getIndividualService(@Nonnull @Named(STANDARD_CLIENT) OkHttpClient client, JacksonConverterFactory jacksonConverterFactory) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(IndividualService.BASE_URL)
+                .client(client)
+                .addConverterFactory(jacksonConverterFactory)
+                .build();
+
+        return retrofit.create(IndividualService.class);
     }
 }

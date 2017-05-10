@@ -3,6 +3,7 @@ package org.jdc.template.ux.startup;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import org.jdc.template.R;
 import org.jdc.template.inject.Injector;
@@ -39,5 +40,10 @@ public class StartupActivity extends Activity implements StartupContract.View {
     @Override
     public void close() {
         finish();
+    }
+
+    @Override
+    public void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

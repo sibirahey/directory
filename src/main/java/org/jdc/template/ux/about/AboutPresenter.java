@@ -1,6 +1,8 @@
 package org.jdc.template.ux.about;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.android.gms.analytics.HitBuilders;
 
@@ -24,7 +26,11 @@ import org.jdc.template.model.type.IndividualType;
 import org.jdc.template.model.webservice.colors.ColorService;
 import org.jdc.template.model.webservice.colors.dto.DtoColor;
 import org.jdc.template.model.webservice.colors.dto.DtoColors;
+import org.jdc.template.model.webservice.individuals.IndividualService;
+import org.jdc.template.model.webservice.individuals.dto.DtoIndividual;
+import org.jdc.template.model.webservice.individuals.dto.DtoIndividuals;
 import org.jdc.template.ui.mvp.BasePresenter;
+import org.jdc.template.util.AppConstants;
 import org.jdc.template.util.RxUtil;
 import org.jdc.template.util.WebServiceUtil;
 import org.threeten.bp.LocalDate;
@@ -56,13 +62,16 @@ public class AboutPresenter extends BasePresenter {
     private final IndividualListManager individualListManager;
     private final IndividualListItemManager individualListItemManager;
     private final ColorService colorService;
+    private final IndividualService individualService;
     private final WebServiceUtil webServiceUtil;
     private AboutContract.View view;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor sharedPreferencesEditor;
 
     @Inject
     public AboutPresenter(Application application, Analytics analytics, Bus bus, IndividualManager individualManager,
                           HouseholdManager householdManager, IndividualListManager individualListManager,
-                          IndividualListItemManager individualListItemManager, ColorService colorService, WebServiceUtil webServiceUtil) {
+                          IndividualListItemManager individualListItemManager, ColorService colorService, IndividualService individualService, WebServiceUtil webServiceUtil) {
         this.application = application;
         this.analytics = analytics;
         this.bus = bus;
@@ -71,7 +80,10 @@ public class AboutPresenter extends BasePresenter {
         this.individualListManager = individualListManager;
         this.individualListItemManager = individualListItemManager;
         this.colorService = colorService;
+        this.individualService = individualService;
         this.webServiceUtil = webServiceUtil;
+        this.sharedPreferences = application.getSharedPreferences(AppConstants.MY_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        this.sharedPreferencesEditor = application.getSharedPreferences(AppConstants.MY_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
     }
 
 
@@ -219,17 +231,17 @@ public class AboutPresenter extends BasePresenter {
      * Simple web service call
      */
     public void testQueryWebServiceCall() {
-        Call<DtoColors> call = colorService.colors();
+        Call<DtoIndividuals> call = individualService.individuals();
 
-        call.enqueue(new Callback<DtoColors>() {
+        call.enqueue(new Callback<DtoIndividuals>() {
             @Override
-            public void onResponse(Call<DtoColors> call, Response<DtoColors> response) {
-                processColorsResponse(response);
+            public void onResponse(Call<DtoIndividuals> call, Response<DtoIndividuals> response) {
+                processIndividualsResponse(response);
             }
 
             @Override
-            public void onFailure(Call<DtoColors> call, Throwable t) {
-                Timber.e(t, "Search FAILED");
+            public void onFailure(Call<DtoIndividuals> call, Throwable throwable) {
+                Timber.e(throwable, "Call FAILED");
             }
         });
     }
@@ -238,12 +250,16 @@ public class AboutPresenter extends BasePresenter {
      * Simple web service call using Rx
      */
     public void testQueryWebServiceCallRx() {
-        RxUtil.toRetrofitObservable(colorService.colors())
-                .subscribeOn(Schedulers.io())
-                .map(response -> RxUtil.verifyRetrofitResponse(response))
-                .filter(dtoSearchResponse -> dtoSearchResponse != null) // don't continue if null
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dtoColors -> processColorsResponse(dtoColors), throwable -> bus.post(new NewDataEvent(false, throwable)), () -> bus.post(new NewDataEvent(true)));
+        if(!sharedPreferences.getBoolean("isWebServiceConsumed", false) ){
+            RxUtil.toRetrofitObservable(individualService.individuals())
+                    .subscribeOn(Schedulers.io())
+                    .map(response -> RxUtil.verifyRetrofitResponse(response))
+                    .filter(dtoSearchResponse -> dtoSearchResponse != null) // don't continue if null
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(dtoIndividuals -> processIndividualsResponse(dtoIndividuals), throwable -> bus.post(new NewDataEvent(false, throwable)), () -> bus.post(new NewDataEvent(true)));
+        }else{
+            view.showMessage("REST Service ALREADY in Database");
+        }
     }
 
     /**
@@ -252,6 +268,9 @@ public class AboutPresenter extends BasePresenter {
     @Subscribe
     public void handle(NewDataEvent event) {
         Timber.i(event.getThrowable(), "Rest Service finished [%b]", event.isSuccess());
+        if(!event.isSuccess()){
+            view.showMessage("REST Service Error");
+        }
     }
 
     /**
@@ -320,6 +339,19 @@ public class AboutPresenter extends BasePresenter {
         for (DtoColor dtoColor : dtoColors.getColors()) {
             Timber.i("Result: %s", dtoColor.getColorName());
         }
+    }
+
+    public void processIndividualsResponse(Response<DtoIndividuals> response) {
+        if (response.isSuccessful()) {
+            Timber.i("Search SUCCESS");
+            processIndividualsResponse(response.body());
+        } else {
+            Timber.e("Search FAILURE: code (%d)", response.code());
+        }
+    }
+
+    public void processIndividualsResponse(DtoIndividuals dtoIndividuals) {
+
     }
 
     /**

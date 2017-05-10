@@ -85,6 +85,7 @@ public class AboutActivity extends BaseActivity implements AboutContract.View {
     @OnClick(R.id.restTestButton)
     public void onRestTestButtonClick() {
         presenter.testQueryWebServiceCallRx();
+        //presenter.testQueryWebServiceCall();
     }
 
     @OnClick(R.id.rxTestButton)
@@ -94,7 +95,10 @@ public class AboutActivity extends BaseActivity implements AboutContract.View {
 
     @Override
     public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
+    @OnClick(R.id.resetButton)
+    public void onResetClick(){ presenter.clearDatabase();}
 
 }

@@ -4,6 +4,7 @@ public class StartupContract {
     interface View {
         void showStartActivity();
         void close();
+        void showMessage(String message);
     }
 
     class Extras {
