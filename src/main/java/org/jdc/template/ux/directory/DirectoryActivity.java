@@ -1,7 +1,11 @@
 package org.jdc.template.ux.directory;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -15,6 +19,7 @@ import org.jdc.template.inject.Injector;
 import org.jdc.template.model.database.main.individual.Individual;
 import org.jdc.template.ui.activity.DrawerActivity;
 import org.jdc.template.ui.menu.CommonMenu;
+import org.jdc.template.util.AppConstants;
 
 import java.util.List;
 
@@ -25,6 +30,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class DirectoryActivity extends DrawerActivity implements SearchView.OnQueryTextListener, DirectoryContract.View {
+
+    private SharedPreferences.Editor sharedPreferencesEditor;
 
     @Inject
     CommonMenu commonMenu;
@@ -58,10 +65,26 @@ public class DirectoryActivity extends DrawerActivity implements SearchView.OnQu
     }
 
     private void setupRecyclerView() {
+        int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        sharedPreferencesEditor = this.getApplication().getSharedPreferences(AppConstants.MY_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+        sharedPreferencesEditor.putInt(AppConstants.DEVICE_SCREEN_SIZE, screenSize);
+        sharedPreferencesEditor.commit();
+
         adapter = new DirectoryAdapter(this);
         adapter.setListener(selectedItemId -> internalIntents.showIndividual(DirectoryActivity.this, selectedItemId));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+
+        switch(screenSize) {
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+                recyclerView.setAdapter(adapter);
+                break;
+            default:
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                recyclerView.setAdapter(adapter);
+        }
+
     }
 
     @Override
