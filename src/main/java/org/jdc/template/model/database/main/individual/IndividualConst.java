@@ -56,7 +56,13 @@ public class IndividualConst {
     public static final String FULL_C_ENABLED = "INDIVIDUAL.ENABLED";
     public static final String C_SPOUSE_INDIVIDUAL_ID = "SPOUSE_INDIVIDUAL_ID";
     public static final String FULL_C_SPOUSE_INDIVIDUAL_ID = "INDIVIDUAL.SPOUSE_INDIVIDUAL_ID";
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS INDIVIDUAL (" + 
+    public static final String C_PROFILE_PICTURE = "PROFILE_PICTURE";
+    public static final String FULL_C_PROFILE_PICURE = "INDIVIDUAL.PROFILE_PICTURE";
+    public static final String C_FORCE_SENSITIVE = "FORCE_SENSITIVE";
+    public static final String FULL_C_FORCE_SENSITIVE = "INDIVIDUAL.FORCE_SENSITIVE";
+    public static final String C_AFFILIATION = "AFFILIATION";
+    public static final String FULL_C_AFFILIATION = "INDIVIDUAL.AFFILIATION";
+    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS INDIVIDUAL (" +
         "_id INTEGER PRIMARY KEY  AUTOINCREMENT," + 
         "HOUSEHOLD_ID INTEGER NOT NULL," + 
         "INDIVIDUAL_TYPE INTEGER NOT NULL," + 
@@ -74,14 +80,17 @@ public class IndividualConst {
         "AMOUNT1 REAL NOT NULL," + 
         "AMOUNT2 REAL NOT NULL," + 
         "ENABLED INTEGER NOT NULL," + 
-        "SPOUSE_INDIVIDUAL_ID INTEGER," + 
+        "SPOUSE_INDIVIDUAL_ID INTEGER," +
+        "PROFILE_PICTURE TEXT NOT NULL," +
+        "FORCE_SENSITIVE INTEGER NOT NULL," +
+        "AFFILIATION TEXT NOT NULL," +
         "FOREIGN KEY (HOUSEHOLD_ID) REFERENCES HOUSEHOLD (_id)" + 
         ");" + 
         "" + 
         "";
     public static final String DROP_TABLE = "DROP TABLE IF EXISTS INDIVIDUAL;";
-    public static final String INSERT_STATEMENT = "INSERT INTO INDIVIDUAL (HOUSEHOLD_ID,INDIVIDUAL_TYPE,INDIVIDUAL_TYPE_TEXT,FIRST_NAME,LAST_NAME,BIRTH_DATE,ALARM_TIME,LAST_MODIFIED,SAMPLE_DATE_TIME,SAMPLE_TIMESTAMP,PHONE,EMAIL,AVAILABLE,AMOUNT1,AMOUNT2,ENABLED,SPOUSE_INDIVIDUAL_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    public static final String UPDATE_STATEMENT = "UPDATE INDIVIDUAL SET HOUSEHOLD_ID=?, INDIVIDUAL_TYPE=?, INDIVIDUAL_TYPE_TEXT=?, FIRST_NAME=?, LAST_NAME=?, BIRTH_DATE=?, ALARM_TIME=?, LAST_MODIFIED=?, SAMPLE_DATE_TIME=?, SAMPLE_TIMESTAMP=?, PHONE=?, EMAIL=?, AVAILABLE=?, AMOUNT1=?, AMOUNT2=?, ENABLED=?, SPOUSE_INDIVIDUAL_ID=? WHERE _id = ?";
+    public static final String INSERT_STATEMENT = "INSERT INTO INDIVIDUAL (HOUSEHOLD_ID,INDIVIDUAL_TYPE,INDIVIDUAL_TYPE_TEXT,FIRST_NAME,LAST_NAME,BIRTH_DATE,ALARM_TIME,LAST_MODIFIED,SAMPLE_DATE_TIME,SAMPLE_TIMESTAMP,PHONE,EMAIL,AVAILABLE,AMOUNT1,AMOUNT2,ENABLED,SPOUSE_INDIVIDUAL_ID,PROFILE_PICTURE,FORCE_SENSITIVE,AFFILIATION) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    public static final String UPDATE_STATEMENT = "UPDATE INDIVIDUAL SET HOUSEHOLD_ID=?, INDIVIDUAL_TYPE=?, INDIVIDUAL_TYPE_TEXT=?, FIRST_NAME=?, LAST_NAME=?, BIRTH_DATE=?, ALARM_TIME=?, LAST_MODIFIED=?, SAMPLE_DATE_TIME=?, SAMPLE_TIMESTAMP=?, PHONE=?, EMAIL=?, AVAILABLE=?, AMOUNT1=?, AMOUNT2=?, ENABLED=?, SPOUSE_INDIVIDUAL_ID=?, PROFILE_PICTURE=?, FORCE_SENSITIVE=?, AFFILIATION=? WHERE _id = ?";
     public static final String[] ALL_COLUMNS = new String[] {
         C_ID,
         C_HOUSEHOLD_ID,
@@ -100,7 +109,10 @@ public class IndividualConst {
         C_AMOUNT1,
         C_AMOUNT2,
         C_ENABLED,
-        C_SPOUSE_INDIVIDUAL_ID};
+        C_SPOUSE_INDIVIDUAL_ID,
+        C_PROFILE_PICTURE,
+        C_FORCE_SENSITIVE,
+        C_AFFILIATION};
     public static final String[] ALL_COLUMNS_FULL = new String[] {
         FULL_C_ID,
         FULL_C_HOUSEHOLD_ID,
@@ -119,7 +131,10 @@ public class IndividualConst {
         FULL_C_AMOUNT1,
         FULL_C_AMOUNT2,
         FULL_C_ENABLED,
-        FULL_C_SPOUSE_INDIVIDUAL_ID};
+        FULL_C_SPOUSE_INDIVIDUAL_ID,
+        FULL_C_PROFILE_PICURE,
+        FULL_C_FORCE_SENSITIVE,
+        FULL_C_AFFILIATION};
 
     public IndividualConst() {
     }
@@ -196,5 +211,15 @@ public class IndividualConst {
         return !cursor.isNull(cursor.getColumnIndexOrThrow(C_SPOUSE_INDIVIDUAL_ID)) ? cursor.getLong(cursor.getColumnIndexOrThrow(C_SPOUSE_INDIVIDUAL_ID)) : null;
     }
 
+    public static String getProfilePicture(Cursor cursor) {
+        return cursor.getString(cursor.getColumnIndexOrThrow(C_PROFILE_PICTURE));
+    }
 
+    public static boolean isForceSensitive(Cursor cursor) {
+        return cursor.getInt(cursor.getColumnIndexOrThrow(C_FORCE_SENSITIVE)) != 0 ? true : false;
+    }
+
+    public static String getAffiliation(Cursor cursor) {
+        return cursor.getString(cursor.getColumnIndexOrThrow(C_AFFILIATION));
+    }
 }

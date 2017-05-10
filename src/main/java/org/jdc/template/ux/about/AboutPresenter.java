@@ -118,9 +118,13 @@ public class AboutPresenter extends BasePresenter {
      */
     public void createSampleDataWithInjection() {
         // clear any existing items
-        individualManager.deleteAll();
-        householdManager.deleteAll();
-        individualListManager.deleteAll();
+        if(!sharedPreferences.getBoolean("isDataBaseCreated", false) ){
+            sharedPreferencesEditor.putBoolean("isDataBaseCreated", true);
+            sharedPreferencesEditor.commit();
+        }else{
+            view.showMessage("Database ALREADY created");
+            return;
+        }
 
         // MAIN Database
         householdManager.beginTransaction();
@@ -351,7 +355,43 @@ public class AboutPresenter extends BasePresenter {
     }
 
     public void processIndividualsResponse(DtoIndividuals dtoIndividuals) {
+        sharedPreferencesEditor.putBoolean("isWebServiceConsumed", true);
+        sharedPreferencesEditor.commit();
 
+        view.showMessage("REST Service Consumed");
+
+        householdManager.beginTransaction();
+
+        Household household = new Household();
+        household.setName("Juan");
+        householdManager.save(household);
+
+        for (DtoIndividual dtoIndividual : dtoIndividuals.getIndividuals()) {
+            Individual individual = new Individual();
+            individual.setFirstName(dtoIndividual.getFirstName());
+            individual.setLastName(dtoIndividual.getLastName());
+            individual.setIndividualType(IndividualType.HEAD);
+            individual.setIndividualTypeText(IndividualType.HEAD);
+            individual.setHouseholdId(household.getId());
+            individual.setBirthDate(formatDate(dtoIndividual.getBirthdate()));
+            individual.setProfilePicture(dtoIndividual.getProfilePicture());
+            individual.setForceSensitive(dtoIndividual.getForceSensitive());
+            individual.setAffiliation(dtoIndividual.getAffiliation());
+            individualManager.save(individual);
+        }
+
+        householdManager.endTransaction(true);
+
+        view.showMessage("REST Service in DataBase");
+
+
+        if(!sharedPreferences.getBoolean("isDataBaseCreated", false) ){
+            sharedPreferencesEditor.putBoolean("isDataBaseCreated", true);
+            sharedPreferencesEditor.commit();
+        }else{
+            view.showMessage("Database ALREADY created");
+            return;
+        }
     }
 
     /**
@@ -421,5 +461,20 @@ public class AboutPresenter extends BasePresenter {
         } else if (change.isDelete()) {
             Timber.i("Rx Individual Table Delete");
         }
+    }
+
+    public void clearDatabase(){
+        sharedPreferencesEditor.putBoolean("isDataBaseCreated", false);
+        sharedPreferencesEditor.putBoolean("isWebServiceConsumed", false);
+        sharedPreferencesEditor.commit();
+        individualManager.deleteAll();
+        householdManager.deleteAll();
+        individualListManager.deleteAll();
+        view.showMessage("Database Cleared");
+    }
+
+    private LocalDate formatDate(String dateString){
+        LocalDate date = LocalDate.parse(dateString);
+        return date;
     }
 }

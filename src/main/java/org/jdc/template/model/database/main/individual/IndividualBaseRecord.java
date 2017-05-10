@@ -37,6 +37,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
     private double amount2 = 0.0;
     private boolean enabled = false;
     private Long spouseIndividualId = null;
+    private String profilePicture = "";
+    private boolean forceSensitive = false;
+    private String affiliation = "";
 
     public IndividualBaseRecord() {
     }
@@ -84,6 +87,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         values.put(IndividualConst.C_AMOUNT2, amount2);
         values.put(IndividualConst.C_ENABLED, enabled ? 1 : 0);
         values.put(IndividualConst.C_SPOUSE_INDIVIDUAL_ID, spouseIndividualId);
+        values.put(IndividualConst.C_PROFILE_PICTURE, profilePicture);
+        values.put(IndividualConst.C_FORCE_SENSITIVE, forceSensitive ? 1 : 0);
+        values.put(IndividualConst.C_AFFILIATION, affiliation);
     }
 
     @Override
@@ -107,6 +113,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
             amount2,
             enabled ? 1 : 0,
             spouseIndividualId,
+            profilePicture,
+            forceSensitive,
+            affiliation
         };
         return values;
     }
@@ -131,6 +140,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         copy.setAmount2(amount2);
         copy.setEnabled(enabled);
         copy.setSpouseIndividualId(spouseIndividualId);
+        copy.setProfilePicture(profilePicture);
+        copy.setForceSensitive(forceSensitive);
+        copy.setAffiliation(affiliation);
         return copy;
     }
 
@@ -169,6 +181,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         } else {
             statement.bindNull(17);
         }
+        statement.bindString(18, profilePicture);
+        statement.bindLong(19, forceSensitive ? 1 : 0);
+        statement.bindString(20, affiliation);
     }
 
     @Override
@@ -206,7 +221,10 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         } else {
             statement.bindNull(17);
         }
-        statement.bindLong(18, id);
+        statement.bindString(18, profilePicture);
+        statement.bindLong(19, forceSensitive ? 1 : 0);
+        statement.bindString(20, affiliation);
+        statement.bindLong(21, id);
     }
 
     public void setContent(DBToolsContentValues values) {
@@ -227,6 +245,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         amount2 = values.getAsDouble(IndividualConst.C_AMOUNT2);
         enabled = values.getAsBoolean(IndividualConst.C_ENABLED);
         spouseIndividualId = values.getAsLong(IndividualConst.C_SPOUSE_INDIVIDUAL_ID);
+        profilePicture = values.getAsString(IndividualConst.C_PROFILE_PICTURE);
+        forceSensitive = values.getAsBoolean(IndividualConst.C_FORCE_SENSITIVE);
+        affiliation = values.getAsString(IndividualConst.C_AFFILIATION);
     }
 
     @Override
@@ -249,6 +270,9 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         amount2 = cursor.getDouble(cursor.getColumnIndexOrThrow(IndividualConst.C_AMOUNT2));
         enabled = cursor.getInt(cursor.getColumnIndexOrThrow(IndividualConst.C_ENABLED)) != 0 ? true : false;
         spouseIndividualId = !cursor.isNull(cursor.getColumnIndexOrThrow(IndividualConst.C_SPOUSE_INDIVIDUAL_ID)) ? cursor.getLong(cursor.getColumnIndexOrThrow(IndividualConst.C_SPOUSE_INDIVIDUAL_ID)) : null;
+        profilePicture = cursor.getString(cursor.getColumnIndexOrThrow(IndividualConst.C_PROFILE_PICTURE));
+        forceSensitive = cursor.getInt(cursor.getColumnIndexOrThrow(IndividualConst.C_FORCE_SENSITIVE)) != 0 ? true : false;
+        affiliation = cursor.getString(cursor.getColumnIndexOrThrow(IndividualConst.C_AFFILIATION));
     }
 
     public boolean isNewRecord() {
@@ -411,5 +435,30 @@ public abstract class IndividualBaseRecord extends AndroidBaseRecord {
         this.spouseIndividualId = spouseIndividualId;
     }
 
+    @javax.annotation.Nonnull
+    public String getProfilePicture() {
+        return profilePicture;
+    }
 
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setForceSensitive(boolean forceSensitive) {
+        this.forceSensitive = forceSensitive;
+    }
+
+    @javax.annotation.Nonnull
+    public boolean isForceSensitive() {
+        return forceSensitive;
+    }
+
+    @javax.annotation.Nonnull
+    public String getAffiliation() {
+        return affiliation;
+    }
+
+    public void setAffiliation(String affiliation) {
+        this.affiliation = affiliation;
+    }
 }
